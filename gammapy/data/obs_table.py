@@ -5,7 +5,6 @@ from astropy.coordinates import Angle, SkyCoord, EarthLocation
 from astropy.table import Table, Column
 from astropy.units import Quantity, Unit
 from gammapy.utils.regions import SphericalCircleSkyRegion
-from gammapy.utils.scripts import make_path
 from gammapy.utils.testing import Checker
 from gammapy.utils.time import time_ref_from_dict
 from gammapy.data.metadata import METADATA_FITS_KEYS_gadf02
@@ -78,41 +77,46 @@ class ObservationTable:
 
         return table
 
-    def read(self, filename, fileformat=None, **kwargs):
+    def read(self, filename, hdu="OBS_INDEX", checksum=False, **kwargs):
         """Modified reader for ObservationTable"""
-        """Header and super().read(make_path(filename), **kwargs) modified from legacy class ObservationTable."""
+        """Based on EventList reader!!!"""
+        """Read from FITS file.
 
-        """Read an observation table from file.
+        Format specification: :ref:`gadf02` or 'gadf03'.
 
         Parameters
         ----------
-        filename : `pathlib.Path` or str
-            Filename.
-        fileformat : str
-            Fileformat, if None and not inferable from HDU, "GADF0.3" for GADF v.0.3 is chosen.
-        **kwargs : dict, optional
-            Keyword arguments passed to `~astropy.table.Table.read`.
+        filename : `pathlib.Path`, str
+            Filename
+        hdu : str
+            Name of events HDU. Default is "OBS_INDEX".
+        checksum : bool
+            If True checks both DATASUM and CHECKSUM cards in the file headers. Default is False.
         """
+        from gammapy.data.io import ObservationTableReader
+
+        return ObservationTableReader(hdu, checksum).read(filename)
 
         # Read disk table "table_disk", taken from class ObervationTable. TODO: Pot. lazy loading in future?"""
-        table_disk = Table.read(make_path(filename), **kwargs)
+        # table_disk = Table.read(make_path(filename), **kwargs)
 
         # Get header of obs-index table.
-        meta = table_disk.meta
+        # meta = table_disk.meta
 
         # If no file-format specified, try to infer file format of table_disk, otherwise use GADF v.0.3. As discussed with @bkhelifi.
-        if fileformat is None:
-            if "HDUCLASS" in meta.keys():
-                if "HDUVERS" in meta.keys():
-                    fileformat = meta["HDUCLASS"] + meta["HDUVERS"]
-            else:
-                fileformat = "GADF0.3"  # Use default "GADF0.3".
 
-        # For specified fileformat call reader to convert to internal data model, as discussed with @bkhelifi, @registerrier.
-        if fileformat == "GADF0.2":
-            return self._read_from_gadf02(table_disk)
-        elif fileformat == "GADF0.3":
-            return self._read_from_gadf03(table_disk)
+    # if fileformat is None:
+    #     if "HDUCLASS" in meta.keys():
+    #         if "HDUVERS" in meta.keys():
+    #             fileformat = meta["HDUCLASS"] + meta["HDUVERS"]
+    #     else:
+    #         fileformat = "GADF0.3"  # Use default "GADF0.3".
+
+    # # For specified fileformat call reader to convert to internal data model, as discussed with @bkhelifi, @registerrier.
+    # if fileformat == "GADF0.2":
+    #     return self._read_from_gadf02(table_disk)
+    # elif fileformat == "GADF0.3":
+    #     return self._read_from_gadf03(table_disk)
 
     def _read_from_gadf03(self, table_disk):
         """Converter from GADF v.0.3 to internal table model."""

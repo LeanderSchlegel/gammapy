@@ -18,12 +18,12 @@ class ObservationTableReader:
     Parameters
     ----------
     hdu : str
-        Name of observation-index HDU. Deafult is OBS-INDEX.
+        Name of observation-index HDU. Deafult is OBS_INDEX.
     checksum : bool
         If True checks both DATASUM and CHECKSUM cards in the file headers. Default is False.
     """
 
-    def __init__(self, hdu="OBS-INDEX", checksum=False):
+    def __init__(self, hdu="OBS_INDEX", checksum=False):
         self.hdu = hdu
         self.checksum = checksum
 

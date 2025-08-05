@@ -2,9 +2,74 @@
 import warnings
 from astropy.io import fits
 from astropy.table import Table
-from gammapy.data import EventListMetaData, EventList
+from gammapy.data import EventListMetaData, EventList, ObservationTable
 from gammapy.utils.scripts import make_path
 from gammapy.utils.metadata import CreatorMetaData
+
+from .metadata import ObservationMetaData
+
+
+class ObservationTableReader:
+    """Reader class for ObservationTable
+    Based on class EventListReader!!!
+
+    Format specification: gadf v.0.2 and v.0.3
+
+    Parameters
+    ----------
+    hdu : str
+        Name of observation-index HDU. Deafult is OBS-INDEX.
+    checksum : bool
+        If True checks both DATASUM and CHECKSUM cards in the file headers. Default is False.
+    """
+
+    def __init__(self, hdu="OBS-INDEX", checksum=False):
+        self.hdu = hdu
+        self.checksum = checksum
+
+    @staticmethod
+    def from_hdu(obs_hdu, format):
+        """Create ObservationTable from HDU with specific format."""
+        table = Table.read(obs_hdu)
+        meta = ObservationMetaData.from_header(table.meta, format)
+        return ObservationTable(table=table, meta=meta)
+
+    @staticmethod
+    def identify_format_from_hduclass(obs_hdu):
+        """Identify format for HDU header keywords."""
+        hduclass = obs_hdu.header.get("HDUCLASS", "unknown")
+        return hduclass.lower()
+
+    def read(self, filename, format="gadf03"):
+        """Read ObservationTable from file.
+
+        Parameters
+        ----------
+        filename : `pathlib.Path`, str
+            Filename
+        format : {"gadf02"}, {"gadf03"} optional
+            format of the ObservationTable. Default is 'gadf03'.
+            If None, will try to guess from header.
+        """
+        filename = make_path(filename)
+
+        with fits.open(filename) as hdulist:
+            obs_hdu = hdulist[self.hdu]
+
+            if self.checksum:
+                if obs_hdu.verify_checksum() != 1:
+                    warnings.warn(
+                        f"Checksum verification failed for HDU {self.hdu} of {filename}.",
+                        UserWarning,
+                    )
+
+            if format is None:
+                format = self.identify_format_from_hduclass(obs_hdu)
+
+            if format == "gadf02" or format == "gadf03":
+                return self.from_gadf_hdu(obs_hdu)
+            else:
+                raise ValueError(f"Unknown format :{format}")
 
 
 class EventListReader:

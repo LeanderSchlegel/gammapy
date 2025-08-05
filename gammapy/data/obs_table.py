@@ -9,6 +9,7 @@ from gammapy.utils.scripts import make_path
 from gammapy.utils.testing import Checker
 from gammapy.utils.time import time_ref_from_dict
 from gammapy.data.metadata import METADATA_FITS_KEYS
+from .metadata import ObservationMetaData
 from astropy.time import Time
 
 __all__ = ["ObservationTable"]
@@ -42,12 +43,12 @@ class ObservationTable:
 
         # If no table given, init with reference table, like suggested by @registerrier.
         if table is None:
-            self.table = self.reference_table()
+            self.table = self._reference_table()
         else:
             self.table = table
-        self.meta = meta
+        self.meta = meta or ObservationMetaData()
 
-    def reference_table(self):
+    def _reference_table(self):
         """Definition of internal observation table model in form of reference table object."""
 
         table = Table(
@@ -105,11 +106,11 @@ class ObservationTable:
 
         # For specified fileformat call reader to convert to internal data model, as discussed with @bkhelifi, @registerrier.
         if fileformat == "GADF0.2":
-            return self.read_from_gadf02(table_disk)
+            return self._read_from_gadf02(table_disk)
         elif fileformat == "GADF0.3":
-            return self.read_from_gadf03(table_disk)
+            return self._read_from_gadf03(table_disk)
 
-    def read_from_gadf03(self, table_disk):
+    def _read_from_gadf03(self, table_disk):
         """Converter from GADF v.0.3 to internal table model."""
         """ Based on specification: https://gamma-astro-data-formats.readthedocs.io/en/v0.3/"""
 
@@ -118,7 +119,7 @@ class ObservationTable:
 
         return table_internal
 
-    def read_from_gadf02(self, table_disk):
+    def _read_from_gadf02(self, table_disk):
         """Converter from GADF v.0.2 to internal table model."""
         """Based on specification: https://gamma-astro-data-formats.readthedocs.io/en/v0.2/"""
 

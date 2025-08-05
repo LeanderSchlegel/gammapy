@@ -37,6 +37,7 @@ class ObservationTable:
         ----------
         table : `astropy.table.Table'
             Table to init ObservationTable from.
+        meta  : Meta data.
 
         Creates instance of ObservationTable either from given table or from reference table.
         """
@@ -48,7 +49,8 @@ class ObservationTable:
             self.table = table
         self.meta = meta or ObservationMetaData()
 
-    def _reference_table(self):
+    @staticmethod
+    def _reference_table():
         """Definition of internal observation table model in form of reference table object."""
 
         table = Table(
@@ -139,6 +141,8 @@ class ObservationTable:
 
         # Get header of obs-index table.
         meta = table_disk.meta
+        # print(meta)
+        # self.meta = ObservationMetaData.from_header(meta)
 
         # Check which info is given for POINTING
         # Used commit 16ce9840f38bea55982d2cd986daa08a3088b434 by @registerrier

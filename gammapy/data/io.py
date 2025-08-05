@@ -67,7 +67,7 @@ class ObservationTableReader:
                 format = self.identify_format_from_hduclass(obs_hdu)
 
             if format == "gadf02" or format == "gadf03":
-                return self.from_gadf_hdu(obs_hdu)
+                return self.from_hdu(obs_hdu, format)
             else:
                 raise ValueError(f"Unknown format :{format}")
 

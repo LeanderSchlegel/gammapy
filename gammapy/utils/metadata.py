@@ -26,7 +26,41 @@ __all__ = [
     "TargetMetaData",
 ]
 
-METADATA_FITS_KEYS = {
+METADATA_FITS_KEYS_gadf03 = {
+    "creator": {
+        "creator": "CREATOR",
+        "date": {
+            "input": lambda v: v.get("CREATED"),
+            "output": lambda v: {"CREATED": v.iso},
+        },
+        "origin": "ORIGIN",
+    },
+    "obs_info": {
+        "telescope": "TELESCOP",
+        "instrument": "INSTRUME",
+        "observation_mode": "OBS_MODE",
+        "obs_id": "OBS_ID",
+    },
+    "pointing": {
+        "radec_mean": {
+            "input": lambda v: skycoord_from_dict(v, frame="icrs", ext="PNT"),
+            "output": lambda v: {"RA_PNT": v.ra.deg, "DEC_PNT": v.dec.deg},
+        },
+        "altaz_mean": {
+            "input": lambda v: skycoord_from_dict(v, frame="altaz", ext="PNT"),
+            "output": lambda v: {"ALT_PNT": v.alt.deg, "AZ_PNT": v.az.deg},
+        },
+    },
+    "target": {
+        "name": "OBJECT",
+        "position": {
+            "input": lambda v: skycoord_from_dict(v, frame="icrs", ext="OBJ"),
+            "output": lambda v: {"RA_OBJ": v.ra.deg, "DEC_OBJ": v.dec.deg},
+        },
+    },
+}
+
+METADATA_FITS_KEYS_gadf02 = {
     "creator": {
         "creator": "CREATOR",
         "date": {
@@ -77,7 +111,7 @@ class MetaData(BaseModel):
         """Returns MetaData tag."""
         return self._tag
 
-    def to_header(self, format="gadf"):
+    def to_header(self, format="gadf03"):
         """Export MetaData to a FITS header.
 
         Conversion is performed following the definition in the METADATA_FITS_EXPORT_KEYS.
@@ -92,12 +126,15 @@ class MetaData(BaseModel):
         header : dict
             The header dictionary.
         """
-        if format != "gadf":
-            raise ValueError(f"Metadata to header: format {format} is not supported.")
+        if format not in ["gadf02", "gadf03"]:
+            raise ValueError(f"Metadata from header: format {format} is not supported.")
 
         hdr_dict = {}
 
-        fits_export_keys = METADATA_FITS_KEYS.get(self.tag)
+        if format == "gadf02":
+            fits_export_keys = METADATA_FITS_KEYS_gadf02.get(self.tag)
+        elif format == "gadf03":
+            fits_export_keys = METADATA_FITS_KEYS_gadf03.get(self.tag)
 
         if fits_export_keys is None:
             # TODO: Should we raise an exception or simply a warning and return empty dict?
@@ -123,23 +160,26 @@ class MetaData(BaseModel):
         return hdr_dict
 
     @classmethod
-    def from_header(cls, header, format="gadf"):
+    def from_header(cls, header, format="gadf03"):
         """Import MetaData from a FITS header.
 
-        Conversion is performed following the definition in the METADATA_FITS_EXPORT_KEYS.
+        Conversion is performed following the definition in the METADATA_FITS_EXPORT_KEYS_{format}.
 
         Parameters
         ----------
         header : dict
             The header dictionary.
-        format : {'gadf'}
-            Header format. Default is 'gadf'.
+        format : {'gadf03'}
+            Header format. Default is 'gadf03'.
         """
         # TODO: implement storage of optional metadata
-        if format != "gadf":
+        if format not in ["gadf02", "gadf03"]:
             raise ValueError(f"Metadata from header: format {format} is not supported.")
 
-        fits_export_keys = METADATA_FITS_KEYS.get(cls._tag)
+        if format == "gadf02":
+            fits_export_keys = METADATA_FITS_KEYS_gadf02.get(cls._tag)
+        elif format == "gadf03":
+            fits_export_keys = METADATA_FITS_KEYS_gadf03.get(cls._tag)
 
         if fits_export_keys is None:
             raise TypeError(f"No FITS export is defined for metadata {cls._tag}.")

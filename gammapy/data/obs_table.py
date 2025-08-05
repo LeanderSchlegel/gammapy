@@ -8,7 +8,7 @@ from gammapy.utils.regions import SphericalCircleSkyRegion
 from gammapy.utils.scripts import make_path
 from gammapy.utils.testing import Checker
 from gammapy.utils.time import time_ref_from_dict
-from gammapy.data.metadata import METADATA_FITS_KEYS
+from gammapy.data.metadata import METADATA_FITS_KEYS_gadf02
 from .metadata import ObservationMetaData
 from astropy.time import Time
 from astropy import units as u
@@ -188,7 +188,7 @@ class ObservationTable:
 
             if "RA_PNT" in required_names_on_disk:
                 row_internal.append(
-                    METADATA_FITS_KEYS["pointing"]["radec_mean"]["input"](
+                    METADATA_FITS_KEYS_gadf02["pointing"]["radec_mean"]["input"](
                         {
                             "RA_PNT": table_disk[i]["RA_PNT"],
                             "DEC_PNT": table_disk[i]["DEC_PNT"],
@@ -197,7 +197,7 @@ class ObservationTable:
                 )
             elif "ALT_PNT" in required_names_on_disk:
                 row_internal.append(
-                    METADATA_FITS_KEYS["pointing"]["altaz_mean"]["input"](
+                    METADATA_FITS_KEYS_gadf02["pointing"]["altaz_mean"]["input"](
                         {
                             "ALT_PNT": table_disk[i]["ALT_PNT"],
                             "AZ_PNT": table_disk[i]["AZ_PNT"],
@@ -206,7 +206,7 @@ class ObservationTable:
                 )
 
             row_internal.append(
-                METADATA_FITS_KEYS["observation"]["location"]["input"](
+                METADATA_FITS_KEYS_gadf02["observation"]["location"]["input"](
                     {
                         "GEOLON": meta["GEOLON"],
                         "GEOLAT": meta["GEOLAT"],

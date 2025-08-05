@@ -3,7 +3,8 @@ from typing import ClassVar, Literal, Optional
 from pydantic import Field
 from gammapy.utils.fits import earth_location_from_dict
 from gammapy.utils.metadata import (
-    METADATA_FITS_KEYS,
+    METADATA_FITS_KEYS_gadf02,
+    METADATA_FITS_KEYS_gadf03,
     CreatorMetaData,
     MetaData,
     ObsInfoMetaData,
@@ -31,15 +32,20 @@ OBSERVATION_METADATA_FITS_KEYS = {
     },
 }
 
-METADATA_FITS_KEYS["observation"] = OBSERVATION_METADATA_FITS_KEYS
+METADATA_FITS_KEYS_gadf02["observation"] = OBSERVATION_METADATA_FITS_KEYS
+
+METADATA_FITS_KEYS_gadf03["observation"] = OBSERVATION_METADATA_FITS_KEYS
 
 
 EVENTLIST_METADATA_FITS_KEYS = {
     "event_class": "EV_CLASS",
 }
 
-METADATA_FITS_KEYS["eventlist"] = EVENTLIST_METADATA_FITS_KEYS
-METADATA_FITS_KEYS["GTI"] = {}
+METADATA_FITS_KEYS_gadf02["eventlist"] = EVENTLIST_METADATA_FITS_KEYS
+METADATA_FITS_KEYS_gadf02["GTI"] = {}
+
+METADATA_FITS_KEYS_gadf03["eventlist"] = EVENTLIST_METADATA_FITS_KEYS
+METADATA_FITS_KEYS_gadf03["GTI"] = {}
 
 
 class ObservationMetaData(MetaData):

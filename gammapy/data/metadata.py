@@ -74,7 +74,7 @@ class ObservationMetaData(MetaData):
     optional: Optional[dict] = None
 
     @classmethod
-    def from_header(cls, header, format="gadf"):
+    def from_header(cls, header, format="gadf03"):
         """Create and fill the observation metadata from the event list metadata.
 
         Parameters
@@ -82,7 +82,7 @@ class ObservationMetaData(MetaData):
         header : dict
             Input FITS header.
         format : str
-            The header data format. Default is gadf.
+            The header data format. Default is gadf03.
         """
         meta = super().from_header(header, format)
 

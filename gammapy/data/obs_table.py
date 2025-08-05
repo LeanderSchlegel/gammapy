@@ -11,6 +11,7 @@ from gammapy.utils.time import time_ref_from_dict
 from gammapy.data.metadata import METADATA_FITS_KEYS
 from .metadata import ObservationMetaData
 from astropy.time import Time
+from astropy import units as u
 
 __all__ = ["ObservationTable"]
 
@@ -69,7 +70,7 @@ class ObservationTable:
                 ),
             ]
         )
-        table["POINTING"] = SkyCoord([], [], unit="deg", frame="icrs")
+        table["POINTING"] = SkyCoord([], [], unit=u.deg, frame="icrs")
         table["LOCATION"] = EarthLocation.from_geodetic([], [], [])
         table["TSTART"] = Time([], format="mjd")
         table["TSTOP"] = Time([], format="mjd")
@@ -141,8 +142,6 @@ class ObservationTable:
 
         # Get header of obs-index table.
         meta = table_disk.meta
-        # print(meta)
-        # self.meta = ObservationMetaData.from_header(meta)
 
         # Check which info is given for POINTING
         # Used commit 16ce9840f38bea55982d2cd986daa08a3088b434 by @registerrier

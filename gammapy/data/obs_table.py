@@ -36,9 +36,10 @@ class ObservationTable:
 
          Parameters
         ----------
-        table : `astropy.table.Table'
+        table : `~astropy.table.Table'
             Table to init ObservationTable from.
-        meta  : Meta data.
+        meta  : `~gammapy.data.ObservationMetaData`
+            The metadata. Default is None.
 
         Creates instance of ObservationTable either from given table or from reference table.
         """

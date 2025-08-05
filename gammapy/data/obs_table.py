@@ -84,7 +84,7 @@ class ObservationTable:
         filename : `pathlib.Path` or str
             Filename.
         fileformat : str
-            Fileformat, default is "GADF0.3" for GADF v.0.3.
+            Fileformat, if None and not inferable from HDU, "GADF0.3" for GADF v.0.3 is chosen.
         **kwargs : dict, optional
             Keyword arguments passed to `~astropy.table.Table.read`.
         """
@@ -231,7 +231,8 @@ class ObservationTable:
     @property
     def pointing_radec(self):
         """Pointing positions in ICRS as a `~astropy.coordinates.SkyCoord` object."""
-        return SkyCoord(self["RA_PNT"], self["DEC_PNT"], unit="deg", frame="icrs")
+        return self.table["POINTING"]
+        # return SkyCoord(self["RA_PNT"], self["DEC_PNT"], unit="deg", frame="icrs")
 
     @property
     def pointing_galactic(self):
@@ -266,10 +267,10 @@ class ObservationTable:
             Observation ids.
         """
         try:
-            self.indices["OBS_ID"]
+            self.table.indices["OBS_ID"]
         except IndexError:
-            self.add_index("OBS_ID")
-        return self.__class__(self.loc["OBS_ID", obs_id])
+            self.table.add_index("OBS_ID")
+        return self.__class__(self.table.loc["OBS_ID", obs_id])
 
     def summary(self):
         """Summary information string."""
